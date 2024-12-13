@@ -52,6 +52,13 @@ public class AccesoDatos {
 		return matriculas;
 	}
 
+	/**
+	 * Verifica si la tabla especificada existe en la base de datos.
+	 * 
+	 * @param nombreTabla El nombre de la tabla a verificar.
+	 * @return <code>true</code> si la tabla existe, <code>false</code> en caso
+	 *         contrario.
+	 */
 	public static boolean tablaExists(String nombreTabla) {
 		Connection conector = null;
 		Statement stmt = null;
@@ -311,7 +318,7 @@ public class AccesoDatos {
 
 			String sql = "INSERT INTO Alumnado (idAlumnado, nombre, apellidos, fechaNac) VALUES (?, ?, ?, ?)";
 
-			// Obtenemos las personas
+			// Obtenemos los alumnos
 			List<Alumnado> alumnos = getAlumnado();
 
 			// Prepararemos la query para que coja los datos de manera dinamica.
@@ -363,7 +370,7 @@ public class AccesoDatos {
 
 			String sql = "INSERT INTO Profesores (idProfesor, nombre, apellidos, fechaNac, antiguedad) VALUES (?, ?, ?, ?, ?)";
 
-			// Obtenemos las personas
+			// Obtenemos los profesores
 			List<Profesores> profesores = getProfesores();
 
 			// Prepararemos la query para que coja los datos de manera dinamica.
@@ -416,7 +423,7 @@ public class AccesoDatos {
 
 			String sql = "INSERT INTO Matricula (idMatricula, idProfesorado, idAlumnado, asignatura, curso) VALUES (?, ?, ?, ?, ?)";
 
-			// Obtenemos las personas
+			// Obtenemos las matriculas
 			List<Matricula> matriculas = getMatricula();
 
 			// Prepararemos la query para que coja los datos de manera dinamica.
@@ -447,9 +454,439 @@ public class AccesoDatos {
 		}
 	}
 
-	public static void Listar() {
+	/**
+	 * Muestra los alumnos que cumplen los criterios de filtrado.
+	 * 
+	 * @param campo     Campo sobre el que se va a filtrar. Puede ser "nombre", "apellidos", "fechaNac".
+	 * @param operador  Operador de comparación. Puede ser "=", "<", ">".
+	 * @param valor     Valor sobre el que se va a filtrar.
+	 * 
+	 * @throws IllegalArgumentException si el campo no es reconocido o el operador no es válido.
+	 * @throws SQLException             si se produce un error al ejecutar la consulta.
+	 */
+	public static void listarAlumnos(String campo, String operador, String valor) {
+		PreparedStatement stmt = null;
+		Connection conector = null;
+		ResultSet rs = null;
 	
+		try {
+			conector = ConexionBD.connect();
+			String sqlBase = "SELECT * FROM Alumno";
+			String sql = sqlBase;
+	
+			// Construcción dinámica del SQL según el filtro proporcionado
+			if (campo != null && operador != null && valor != null) {
+				switch (campo.toLowerCase()) {
+					case "idAlumnado":
+						if (operador.equals("<") || operador.equals(">") || operador.equals("=")) {
+							sql += " WHERE idAlumnado " + operador + " ?";
+						} else {
+							throw new IllegalArgumentException("Operador no válido para idAlumnado: " + operador);
+						}
+					case "nombre":
+						sql += " WHERE nombre = ?";
+						break;
+					case "apellidos":
+						sql += " WHERE apellido LIKE ?";
+						valor = "%" + valor + "%"; // Para buscar con LIKE
+						break;
+					case "fechaNac":
+						if (operador.equals("<") || operador.equals(">")) {
+							sql += " WHERE fechaNacimiento " + operador + " ?";
+						} else {
+							throw new IllegalArgumentException("Operador no válido para fechaNacimiento: " + operador);
+						}
+						break;
+					default:
+						throw new IllegalArgumentException("Campo no reconocido: " + campo);
+				}
+			}
+	
+			stmt = conector.prepareStatement(sql);
+	
+			if (campo != null && operador != null && valor != null) {
+				stmt.setString(1, valor);
+			}
+	
+			rs = stmt.executeQuery();
+	
+			// Imprimir los resultados
+			while (rs.next()) {
+				int idAlumnado = rs.getInt("idAlumnado");
+				String nombre = rs.getString("nombre");
+				String apellidos = rs.getString("apellido");
+				String fechaNac = rs.getString("fechaNac");
+	
+				System.out.println("ID: " + idAlumnado + ", Nombre: " + nombre + ", Apellido: " + apellidos + ", Fecha de Nacimiento: " + fechaNac);
+			}
+	
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conector != null)
+					conector.close();
+			} catch (SQLException se) {
+				System.out.println("No se ha podido cerrar la conexión.");
+			}
+		}
 	}
+
+	/**
+ 	* Muestra todos los registros de la tabla "Alumno" de la base de datos.
+ 	*
+ 	* Utiliza una sentencia SQL para seleccionar todos los registros de la tabla
+ 	* "Alumno" y los imprime en la consola. Gestiona y reporta cualquier error que
+ 	* pueda ocurrir durante la ejecución.
+ 	*/
+
+	public static void listarTodosAlumnos() {
+		Statement stmt = null;
+		Connection conector = null;
+		ResultSet rs = null;
+	
+		try {
+			conector = ConexionBD.connect();
+			String sql = "SELECT * FROM Alumno";
+	
+			stmt = conector.createStatement();
+			rs = stmt.executeQuery(sql);
+	
+			// Imprimir los resultados
+			while (rs.next()) {
+				int idAlumnado = rs.getInt("idAlumnado");
+				String nombre = rs.getString("nombre");
+				String apellidos = rs.getString("apellido");
+				String fechaNac = rs.getString("fechaNac");
+	
+				System.out.println("ID: " + idAlumnado + ", Nombre: " + nombre + ", Apellido: " + apellidos + ", Fecha de Nacimiento: " + fechaNac);
+			}
+	
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conector != null)
+					conector.close();
+			} catch (SQLException se) {
+				System.out.println("No se ha podido cerrar la conexión.");
+			}
+		}
+	}
+	
+	
+	/**
+	 * Muestra los profesores que cumplen los criterios de filtrado.
+	 * 
+	 * @param campo     Campo sobre el que se va a filtrar. Puede ser "nombre", "apellidos", "fechanac" o "antiguedad".
+	 * @param operador  Operador de comparación. Puede ser "=", "<", ">".
+	 * @param valor     Valor sobre el que se va a filtrar.
+	 * 
+	 * @throws IllegalArgumentException si el campo no es reconocido o el operador no es válido.
+	 * @throws SQLException             si se produce un error al ejecutar la consulta.
+	 */
+	public static void listarProfesores(String campo, String operador, String valor) {
+		PreparedStatement stmt = null;
+		Connection conector = null;
+		ResultSet rs = null;
+	
+		try {
+			conector = ConexionBD.connect();
+			String sqlBase = "SELECT * FROM Profesor";
+			String sql = sqlBase;
+	
+			// Construcción dinámica del SQL según el filtro proporcionado
+			if (campo != null && operador != null && valor != null) {
+				switch (campo.toLowerCase()) {
+					case "idProfesor":
+						if (operador.equals("<") || operador.equals(">") || operador.equals("=")) {
+							sql += " WHERE idProfesor " + operador + " ?";
+						} else {
+							throw new IllegalArgumentException("Operador no válido para idProfesor: " + operador);
+						}
+						break;
+					case "nombre":
+						sql += " WHERE nombre = ?";
+						break;
+					case "apellidos":
+						sql += " WHERE apellidos LIKE ?";
+						valor = "%" + valor + "%"; // Para buscar con LIKE
+						break;
+					case "fechanac":
+						if (operador.equals("<") || operador.equals(">")) {
+							sql += " WHERE fechaNac " + operador + " ?";
+						} else {
+							throw new IllegalArgumentException("Operador no válido para fechaNac: " + operador);
+						}
+						break;
+					case "antiguedad":
+						if (operador.equals("<") || operador.equals(">") || operador.equals("=")) {
+							sql += " WHERE antiguedad " + operador + " ?";
+						} else {
+							throw new IllegalArgumentException("Operador no válido para antiguedad: " + operador);
+						}
+						break;
+					default:
+						throw new IllegalArgumentException("Campo no reconocido: " + campo);
+				}
+			}
+	
+			stmt = conector.prepareStatement(sql);
+	
+			if (campo != null && operador != null && valor != null) {
+				if (campo.equalsIgnoreCase("antiguedad")) {
+					stmt.setInt(1, Integer.parseInt(valor));
+				} else {
+					stmt.setString(1, valor);
+				}
+			}
+	
+			rs = stmt.executeQuery();
+	
+			// Imprimir los resultados
+			while (rs.next()) {
+				int idProfesor = rs.getInt("idProfesor");
+				String nombre = rs.getString("nombre");
+				String apellidos = rs.getString("apellidos");
+				String fechaNac = rs.getString("fechaNac");
+				int antiguedad = rs.getInt("antiguedad");
+	
+				System.out.println("ID: " + idProfesor + ", Nombre: " + nombre + ", Apellidos: " + apellidos + ", Fecha de Nacimiento: " + fechaNac + ", Antigüedad: " + antiguedad);
+			}
+	
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conector != null)
+					conector.close();
+			} catch (SQLException se) {
+				System.out.println("No se ha podido cerrar la conexión.");
+			}
+		}
+	}
+
+	/**
+	 * Muestra todos los profesores de la base de datos.
+	 * 
+	 * Este método se conecta a la base de datos, selecciona la base de datos
+	 * especificada y ejecuta una sentencia SQL para obtener todos los profesores
+	 * de la tabla "Profesores". La tabla contiene las columnas: idProfesor, nombre,
+	 * apellidos, fechaNac y antiguedad. Imprime los resultados en la consola.
+	 * 
+	 */
+	public static void listarTodosProfesores() {
+		Statement stmt = null;
+		Connection conector = null;
+		ResultSet rs = null;
+	
+		try {
+			conector = ConexionBD.connect();
+			String sql = "SELECT * FROM Profesores";
+	
+			stmt = conector.createStatement();
+			rs = stmt.executeQuery(sql);
+	
+			// Imprimir los resultados
+			while (rs.next()) {
+				int idProfesor = rs.getInt("idProfesor");
+				String nombre = rs.getString("nombre");
+				String apellidos = rs.getString("apellido");
+				String fechaNac = rs.getString("fechaNac");
+				String antiguedad = rs.getString("antiguedad");
+	
+				System.out.println("ID: " + idProfesor + ", Nombre: " + nombre + ", Apellido: " + apellidos + ", Fecha de Nacimiento: " + fechaNac + ", Antiguedad: " +antiguedad);
+			}
+	
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conector != null)
+					conector.close();
+			} catch (SQLException se) {
+				System.out.println("No se ha podido cerrar la conexión.");
+			}
+		}
+	}
+
+	
+	/**
+	 * Muestra las matriculas que cumplen los criterios de filtrado.
+	 * 
+	 * @param campo     Campo sobre el que se va a filtrar. Puede ser "idmatricula", "idprofesorado", "idalumnado", "asignatura" o "curso".
+	 * @param operador  Operador de comparación. Puede ser "=", "<", ">".
+	 * @param valor     Valor sobre el que se va a filtrar.
+	 * 
+	 * @throws IllegalArgumentException si el campo no es reconocido o el operador no es válido.
+	 * @throws SQLException             si se produce un error al ejecutar la consulta.
+	 */
+	public static void listarMatricula(String campo, String operador, String valor) {
+		PreparedStatement stmt = null;
+		Connection conector = null;
+		ResultSet rs = null;
+	
+		try {
+			conector = ConexionBD.connect();
+			String sqlBase = "SELECT * FROM Matricula";
+			String sql = sqlBase;
+	
+			// Construcción dinámica del SQL según el filtro proporcionado
+			if (campo != null && operador != null && valor != null) {
+				switch (campo.toLowerCase()) {
+					case "idmatricula":
+						if (operador.equals("<") || operador.equals(">") || operador.equals("=")) {
+							sql += " WHERE idMatricula " + operador + " ?";
+						} else {
+							throw new IllegalArgumentException("Operador no válido para idMatricula: " + operador);
+						}
+						break;
+					case "idprofesorado":
+						if (operador.equals("<") || operador.equals(">") || operador.equals("=")) {
+							sql += " WHERE idProfesorado " + operador + " ?";
+						} else {
+							throw new IllegalArgumentException("Operador no válido para idProfesorado: " + operador);
+						}
+						break;
+					case "idalumnado":
+						if (operador.equals("<") || operador.equals(">") || operador.equals("=")) {
+							sql += " WHERE idAlumnado " + operador + " ?";
+						} else {
+							throw new IllegalArgumentException("Operador no válido para idAlumnado: " + operador);
+						}
+						break;
+					case "asignatura":
+						sql += " WHERE asignatura LIKE ?";
+						valor = "%" + valor + "%"; // Para buscar con LIKE
+						break;
+					case "curso":
+						if (operador.equals("<") || operador.equals(">") || operador.equals("=")) {
+							sql += " WHERE curso " + operador + " ?";
+						} else {
+							throw new IllegalArgumentException("Operador no válido para curso: " + operador);
+						}
+						break;
+					default:
+						throw new IllegalArgumentException("Campo no reconocido: " + campo);
+				}
+			}
+	
+			stmt = conector.prepareStatement(sql);
+	
+			if (campo != null && operador != null && valor != null) {
+				if (campo.equalsIgnoreCase("idmatricula") || campo.equalsIgnoreCase("idprofesorado") || campo.equalsIgnoreCase("idalumnado") || campo.equalsIgnoreCase("curso")) {
+					stmt.setInt(1, Integer.parseInt(valor));
+				} else {
+					stmt.setString(1, valor);
+				}
+			}
+	
+			rs = stmt.executeQuery();
+	
+			// Imprimir los resultados
+			while (rs.next()) {
+				int idMatricula = rs.getInt("idMatricula");
+				int idProfesorado = rs.getInt("idProfesorado");
+				int idAlumnado = rs.getInt("idAlumnado");
+				String asignatura = rs.getString("asignatura");
+				int curso = rs.getInt("curso");
+	
+				System.out.println("ID Matricula: " + idMatricula + ", ID Profesorado: " + idProfesorado + ", ID Alumnado: " + idAlumnado + ", Asignatura: " + asignatura + ", Curso: " + curso);
+			}
+	
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conector != null)
+					conector.close();
+			} catch (SQLException se) {
+				System.out.println("No se ha podido cerrar la conexión.");
+			}
+		}
+	}
+
+	/**
+ 	* Muestra todas las matriculas que se encuentran en la base de datos.
+ 	*
+ 	* Muestra todas las matriculas que se encuentran en la base de datos, con sus
+ 	* respectivos campos: idMatricula, idProfesorado, idAlumnado, asignatura y
+ 	* curso.
+ 	*
+ 	*/
+	public static void listarTodasMatriculas() {
+		Statement stmt = null;
+		Connection conector = null;
+		ResultSet rs = null;
+	
+		try {
+			conector = ConexionBD.connect();
+			String sql = "SELECT * FROM Matricula";
+	
+			stmt = conector.createStatement();
+			rs = stmt.executeQuery(sql);
+	
+			// Imprimir los resultados
+			while (rs.next()) {
+				int idMatricula = rs.getInt("idMatricula");
+				int idProfesor = rs.getInt("idProfesor");
+				int idAlumnado = rs.getInt("idAlumnado");
+				String asignatura = rs.getString("asignatura");
+				int curso = rs.getInt("curso");
+				
+	
+				System.out.println("ID Matricula: "+idMatricula+ ", IDProfesor: " + idProfesor + ", IDAlumnado: " + idAlumnado + ", Asignatura: " + asignatura + ", Curso: " + curso);
+			}
+	
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (conector != null)
+					conector.close();
+			} catch (SQLException se) {
+				System.out.println("No se ha podido cerrar la conexión.");
+			}
+		}
+	}
+	
+	
 
 	public static void Modificar() {
 	
