@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import ent.Alumnado;
 import ent.Matricula;
@@ -888,15 +889,356 @@ public class AccesoDatos {
 	
 	
 
-	public static void Modificar() {
-	
+	public static void modificarDatosMatricula() {
+    Statement stmt = null;
+    Connection conector = null;
+    ResultSet rs = null;
+    try (Scanner scanner = new Scanner(System.in)) {
+		try {
+		    conector = ConexionBD.connect();
+		    conector.setAutoCommit(false); // Iniciar la transacción
+
+		    System.out.println("Indique el ID de la matrícula que desea modificar: ");
+		    int idMatriculaFiltro = scanner.nextInt();
+		    scanner.nextLine(); 
+
+		    System.out.println("Introduzca el nuevo ID de Profesor: ");
+		    int nuevoIdProfesor = scanner.nextInt();
+		    scanner.nextLine(); 
+
+		    System.out.println("Introduzca el nuevo ID de Alumnado: ");
+		    int nuevoIdAlumnado = scanner.nextInt();
+		    scanner.nextLine(); 
+
+		    System.out.println("Introduzca la nueva asignatura: ");
+		    String nuevaAsignatura = scanner.nextLine();
+
+		    System.out.println("Introduzca el nuevo curso: ");
+		    int nuevoCurso = scanner.nextInt();
+		    scanner.nextLine(); 
+
+		    String sqlUpdate = "UPDATE Matricula SET idProfesor = ?, idAlumnado = ?, asignatura = ?, curso = ? WHERE idMatricula = ?";
+		    PreparedStatement pstmt = conector.prepareStatement(sqlUpdate);
+
+		    pstmt.setInt(1, nuevoIdProfesor);
+		    pstmt.setInt(2, nuevoIdAlumnado);
+		    pstmt.setString(3, nuevaAsignatura);
+		    pstmt.setInt(4, nuevoCurso);
+		    pstmt.setInt(5, idMatriculaFiltro);
+
+		    int filasAfectadas = pstmt.executeUpdate();
+
+		    if (filasAfectadas > 0) {
+		        System.out.println("Datos modificados correctamente. Mostrando el resultado:");
+
+		        String sqlSelect = "SELECT * FROM Matricula WHERE idMatricula = ?";
+		        pstmt = conector.prepareStatement(sqlSelect);
+		        pstmt.setInt(1, idMatriculaFiltro);
+
+		        rs = pstmt.executeQuery();
+		        while (rs.next()) {
+		            System.out.println("ID Matricula: " + rs.getInt("idMatricula") + ", ID Profesor: " + rs.getInt("idProfesor") + ", ID Alumnado: " + rs.getInt("idAlumnado") + ", Asignatura: " + rs.getString("asignatura") + ", Curso: " + rs.getInt("curso"));
+		        }
+
+		        System.out.println("¿Desea confirmar los cambios? (sí/no): ");
+		        String respuesta = scanner.nextLine();
+
+		        if (respuesta.equalsIgnoreCase("sí")) {
+		            conector.commit();
+		            System.out.println("Los cambios han sido confirmados.");
+		        } else {
+		            conector.rollback();
+		            System.out.println("Los cambios han sido deshechos.");
+		        }
+		    } else {
+		        System.out.println("No se encontró ninguna matrícula con el ID proporcionado.");
+		        conector.rollback();
+		    }
+
+		} catch (SQLException se) {
+		    try {
+		        if (conector != null) conector.rollback();
+		    } catch (SQLException rollbackEx) {
+		        rollbackEx.printStackTrace();
+		    }
+		    se.printStackTrace();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		} finally {
+		    try {
+		        if (rs != null) rs.close();
+		        if (stmt != null) stmt.close();
+		        if (conector != null) conector.close();
+		    } catch (SQLException se) {
+		        System.out.println("No se ha podido cerrar la conexión.");
+		    }
+		}
 	}
-	
-	public static void Borrar() {
-		
+}
+
+
+	public static void modificarDatosProfesor() {
+    Statement stmt = null;
+    Connection conector = null;
+    ResultSet rs = null;
+    try (Scanner scanner = new Scanner(System.in)) {
+		try {
+		    conector = ConexionBD.connect();
+		    conector.setAutoCommit(false); // Iniciar la transacción
+
+		    System.out.println("Indique el ID del profesor que desea modificar: ");
+		    int idProfesorFiltro = scanner.nextInt();
+		    scanner.nextLine(); // Consumir el salto de línea
+
+		    System.out.println("Introduzca el nuevo nombre: ");
+		    String nuevoNombre = scanner.nextLine();
+
+		    System.out.println("Introduzca los nuevos apellidos: ");
+		    String nuevosApellidos = scanner.nextLine();
+
+		    System.out.println("Introduzca la nueva fecha de nacimiento (YYYY-MM-DD): ");
+		    String nuevaFechaNac = scanner.nextLine();
+
+		    System.out.println("Introduzca la nueva antigüedad: ");
+		    int nuevaAntiguedad = scanner.nextInt();
+		    scanner.nextLine(); // Consumir el salto de línea
+
+		    String sqlUpdate = "UPDATE Profesor SET nombre = ?, apellidos = ?, fechaNac = ?, antiguedad = ? WHERE idProfesor = ?";
+		    PreparedStatement pstmt = conector.prepareStatement(sqlUpdate);
+
+		    pstmt.setString(1, nuevoNombre);
+		    pstmt.setString(2, nuevosApellidos);
+		    pstmt.setString(3, nuevaFechaNac);
+		    pstmt.setInt(4, nuevaAntiguedad);
+		    pstmt.setInt(5, idProfesorFiltro);
+
+		    int filasAfectadas = pstmt.executeUpdate();
+
+		    if (filasAfectadas > 0) {
+		        System.out.println("Datos modificados correctamente. Mostrando el resultado:");
+
+		        String sqlSelect = "SELECT * FROM Profesor WHERE idProfesor = ?";
+		        pstmt = conector.prepareStatement(sqlSelect);
+		        pstmt.setInt(1, idProfesorFiltro);
+
+		        rs = pstmt.executeQuery();
+		        while (rs.next()) {
+		            System.out.println("ID Profesor: " + rs.getInt("idProfesor") + ", Nombre: " + rs.getString("nombre") + ", Apellidos: " + rs.getString("apellidos") + ", Fecha de Nacimiento: " + rs.getString("fechaNac") + ", Antigüedad: " + rs.getInt("antiguedad"));
+		        }
+
+		        System.out.println("¿Desea confirmar los cambios? (sí/no): ");
+		        String respuesta = scanner.nextLine();
+
+		        if (respuesta.equalsIgnoreCase("sí")) {
+		            conector.commit();
+		            System.out.println("Los cambios han sido confirmados.");
+		        } else {
+		            conector.rollback();
+		            System.out.println("Los cambios han sido deshechos.");
+		        }
+		    } else {
+		        System.out.println("No se encontró ningún profesor con el ID proporcionado.");
+		        conector.rollback();
+		    }
+
+		} catch (SQLException se) {
+		    try {
+		        if (conector != null) conector.rollback();
+		    } catch (SQLException rollbackEx) {
+		        rollbackEx.printStackTrace();
+		    }
+		    se.printStackTrace();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		} finally {
+		    try {
+		        if (rs != null) rs.close();
+		        if (stmt != null) stmt.close();
+		        if (conector != null) conector.close();
+		    } catch (SQLException se) {
+		        System.out.println("No se ha podido cerrar la conexión.");
+		    }
+		}
 	}
-	
-	public static void EliminarTabla() {
-		
+}
+
+
+	public static void modificarDatosAlumnado() {
+    Statement stmt = null;
+    Connection conector = null;
+    ResultSet rs = null;
+    try (Scanner scanner = new Scanner(System.in)) {
+		try {
+		    conector = ConexionBD.connect();
+		    conector.setAutoCommit(false); // Iniciar la transacción
+
+		    System.out.println("Indique el ID del alumnado que desea modificar: ");
+		    int idAlumnadoFiltro = scanner.nextInt();
+		    scanner.nextLine(); // Consumir el salto de línea
+
+		    System.out.println("Introduzca el nuevo nombre: ");
+		    String nuevoNombre = scanner.nextLine();
+
+		    System.out.println("Introduzca los nuevos apellidos: ");
+		    String nuevosApellidos = scanner.nextLine();
+
+		    System.out.println("Introduzca la nueva fecha de nacimiento (YYYY-MM-DD): ");
+		    String nuevaFechaNac = scanner.nextLine();
+
+		    String sqlUpdate = "UPDATE Alumnado SET nombre = ?, apellidos = ?, fechaNac = ? WHERE idAlumnado = ?";
+		    PreparedStatement pstmt = conector.prepareStatement(sqlUpdate);
+
+		    pstmt.setString(1, nuevoNombre);
+		    pstmt.setString(2, nuevosApellidos);
+		    pstmt.setString(3, nuevaFechaNac);
+		    pstmt.setInt(4, idAlumnadoFiltro);
+
+		    int filasAfectadas = pstmt.executeUpdate();
+
+		    if (filasAfectadas > 0) {
+		        System.out.println("Datos modificados correctamente. Mostrando el resultado:");
+
+		        String sqlSelect = "SELECT * FROM Alumnado WHERE idAlumnado = ?";
+		        pstmt = conector.prepareStatement(sqlSelect);
+		        pstmt.setInt(1, idAlumnadoFiltro);
+
+		        rs = pstmt.executeQuery();
+		        while (rs.next()) {
+		            System.out.println("ID Alumnado: " + rs.getInt("idAlumnado") + ", Nombre: " + rs.getString("nombre") + ", Apellidos: " + rs.getString("apellidos") + ", Fecha de Nacimiento: " + rs.getString("fechaNac"));
+		        }
+
+		        System.out.println("¿Desea confirmar los cambios? (sí/no): ");
+		        String respuesta = scanner.nextLine();
+
+		        if (respuesta.equalsIgnoreCase("sí")) {
+		            conector.commit();
+		            System.out.println("Los cambios han sido confirmados.");
+		        } else {
+		            conector.rollback();
+		            System.out.println("Los cambios han sido deshechos.");
+		        }
+		    } else {
+		        System.out.println("No se encontró ningún alumnado con el ID proporcionado.");
+		        conector.rollback();
+		    }
+
+		} catch (SQLException se) {
+		    try {
+		        if (conector != null) conector.rollback();
+		    } catch (SQLException rollbackEx) {
+		        rollbackEx.printStackTrace();
+		    }
+		    se.printStackTrace();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		} finally {
+		    try {
+		        if (rs != null) rs.close();
+		        if (stmt != null) stmt.close();
+		        if (conector != null) conector.close();
+		    } catch (SQLException se) {
+		        System.out.println("No se ha podido cerrar la conexión.");
+		    }
+		}
 	}
+}
+
+
+public static void borrarDatosMatricula() {
+    Connection conector = null;
+    Statement stmt = null;
+    ResultSet rs = null;
+    try (Scanner scanner = new Scanner(System.in)) {
+		try {
+		    conector = ConexionBD.connect();
+		    conector.setAutoCommit(false); // Iniciar la transacción
+
+		    System.out.println("¿Desea borrar todas las tablas o una tabla concreta? (todas/concreta): ");
+		    String opcion = scanner.nextLine();
+
+		    if (opcion.equalsIgnoreCase("todas")) {
+		        System.out.println("ADVERTENCIA: Esta acción borrará todas las tablas y no podrá deshacerse. ¿Desea continuar? (sí/no): ");
+		        String confirmar = scanner.nextLine();
+
+		        if (confirmar.equalsIgnoreCase("sí")) {
+		            stmt = conector.createStatement();
+		            stmt.executeUpdate("DROP TABLE Matricula"); // Ajustar según las dependencias de otras tablas
+		            conector.commit();
+		            System.out.println("Todas las tablas han sido borradas.");
+		        } else {
+		            System.out.println("Operación cancelada.");
+		            conector.rollback();
+		        }
+		    } else if (opcion.equalsIgnoreCase("concreta")) {
+		        System.out.println("¿Desea borrar todos los datos de la tabla Matricula o aplicar un filtro? (todos/filtro): ");
+		        String filtroOpcion = scanner.nextLine();
+
+		        if (filtroOpcion.equalsIgnoreCase("todos")) {
+		            System.out.println("ADVERTENCIA: Esta acción borrará todos los datos de la tabla Matricula. ¿Desea continuar? (sí/no): ");
+		            String confirmar = scanner.nextLine();
+
+		            if (confirmar.equalsIgnoreCase("sí")) {
+		                stmt = conector.createStatement();
+		                stmt.executeUpdate("DELETE FROM Matricula");
+		                conector.commit();
+		                System.out.println("Todos los datos de la tabla Matricula han sido borrados.");
+		            } else {
+		                System.out.println("Operación cancelada.");
+		                conector.rollback();
+		            }
+		        } else if (filtroOpcion.equalsIgnoreCase("filtro")) {
+		            System.out.println("Indique el filtro para borrar los datos (ejemplo: asignatura = 'Matemáticas'): ");
+		            String filtro = scanner.nextLine();
+
+		            String sqlSelect = "SELECT * FROM Matricula WHERE " + filtro;
+		            stmt = conector.createStatement();
+		            rs = stmt.executeQuery(sqlSelect);
+
+		            System.out.println("Datos que serán eliminados:");
+		            while (rs.next()) {
+		                System.out.println("ID Matricula: " + rs.getInt("idMatricula") + ", ID Profesor: " + rs.getInt("idProfesor") + ", ID Alumnado: " + rs.getInt("idAlumnado") + ", Asignatura: " + rs.getString("asignatura") + ", Curso: " + rs.getInt("curso"));
+		            }
+
+		            System.out.println("¿Desea confirmar la eliminación de estos datos? (sí/no): ");
+		            String confirmar = scanner.nextLine();
+
+		            if (confirmar.equalsIgnoreCase("sí")) {
+		                String sqlDelete = "DELETE FROM Matricula WHERE " + filtro;
+		                stmt.executeUpdate(sqlDelete);
+		                conector.commit();
+		                System.out.println("Los datos han sido eliminados correctamente.");
+		            } else {
+		                System.out.println("Operación cancelada.");
+		                conector.rollback();
+		            }
+		        } else {
+		            System.out.println("Opción no válida. Operación cancelada.");
+		            conector.rollback();
+		        }
+		    } else {
+		        System.out.println("Opción no válida. Operación cancelada.");
+		        conector.rollback();
+		    }
+
+		} catch (SQLException se) {
+		    try {
+		        if (conector != null) conector.rollback();
+		    } catch (SQLException rollbackEx) {
+		        rollbackEx.printStackTrace();
+		    }
+		    se.printStackTrace();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		} finally {
+		    try {
+		        if (rs != null) rs.close();
+		        if (stmt != null) stmt.close();
+		        if (conector != null) conector.close();
+		    } catch (SQLException se) {
+		        System.out.println("No se ha podido cerrar la conexión.");
+		    }
+		}
+	}
+}
+
 }
