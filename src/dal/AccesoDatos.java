@@ -1240,5 +1240,268 @@ public static void borrarDatosMatricula() {
 		}
 	}
 }
+public static void borrarDatosProfesor() {
+    Connection conector = null;
+    Statement stmt = null;
+    ResultSet rs = null;
+    try (Scanner scanner = new Scanner(System.in)) {
+        try {
+            conector = ConexionBD.connect();
+            conector.setAutoCommit(false); 
+
+            System.out.println("¿Desea borrar todos los profesores o aplicar un filtro? (todos/filtro): ");
+            String opcion = scanner.nextLine();
+
+            if (opcion.equalsIgnoreCase("todos")) {
+                System.out.println("ADVERTENCIA: Esta acción borrará todos los datos de los profesores. ¿Desea continuar? (sí/no): ");
+                String confirmar = scanner.nextLine();
+
+                if (confirmar.equalsIgnoreCase("sí")) {
+                    stmt = conector.createStatement();
+                    stmt.executeUpdate("DELETE FROM Profesores");
+                    conector.commit();
+                    System.out.println("Todos los datos de la tabla Profesores han sido borrados.");
+                } else {
+                    System.out.println("Operación cancelada.");
+                    conector.rollback();
+                }
+            } else if (opcion.equalsIgnoreCase("filtro")) {
+                System.out.println("Indique el filtro para borrar los datos (ejemplo: antiguedad > 5): ");
+                String filtro = scanner.nextLine();
+
+                String sqlSelect = "SELECT * FROM Profesores WHERE " + filtro;
+                stmt = conector.createStatement();
+                rs = stmt.executeQuery(sqlSelect);
+
+                System.out.println("Datos que serán eliminados:");
+                while (rs.next()) {
+                    System.out.println("ID Profesor: " + rs.getInt("idProfesor") + ", Nombre: " + rs.getString("nombre") + ", Apellidos: " + rs.getString("apellidos") + ", Fecha Nacimiento: " + rs.getString("fechaNac") + ", Antigüedad: " + rs.getInt("antiguedad"));
+                }
+
+                System.out.println("¿Desea confirmar la eliminación de estos datos? (sí/no): ");
+                String confirmar = scanner.nextLine();
+
+                if (confirmar.equalsIgnoreCase("sí")) {
+                    String sqlDelete = "DELETE FROM Profesores WHERE " + filtro;
+                    stmt.executeUpdate(sqlDelete);
+                    conector.commit();
+                    System.out.println("Los datos han sido eliminados correctamente.");
+                } else {
+                    System.out.println("Operación cancelada.");
+                    conector.rollback();
+                }
+            } else {
+                System.out.println("Opción no válida. Operación cancelada.");
+                conector.rollback();
+            }
+
+        } catch (SQLException se) {
+            try {
+                if (conector != null) conector.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conector != null) conector.close();
+            } catch (SQLException se) {
+                System.out.println("No se ha podido cerrar la conexión.");
+            }
+        }
+    }
+}
+public static void borrarDatosAlumnado() {
+    Connection conector = null;
+    Statement stmt = null;
+    ResultSet rs = null;
+    try (Scanner scanner = new Scanner(System.in)) {
+        try {
+            conector = ConexionBD.connect();
+            conector.setAutoCommit(false); 
+
+            System.out.println("¿Desea borrar todos los registros de alumnado o aplicar un filtro? (todos/filtro): ");
+            String opcion = scanner.nextLine();
+
+            if (opcion.equalsIgnoreCase("todos")) {
+                System.out.println("ADVERTENCIA: Esta acción borrará todos los datos de los alumnos. ¿Desea continuar? (sí/no): ");
+                String confirmar = scanner.nextLine();
+
+                if (confirmar.equalsIgnoreCase("sí")) {
+                    stmt = conector.createStatement();
+                    stmt.executeUpdate("DELETE FROM Alumnado");
+                    conector.commit();
+                    System.out.println("Todos los datos de la tabla Alumnado han sido borrados.");
+                } else {
+                    System.out.println("Operación cancelada.");
+                    conector.rollback();
+                }
+            } else if (opcion.equalsIgnoreCase("filtro")) {
+                System.out.println("Indique el filtro para borrar los datos (ejemplo: nombre = 'Juan'):");
+                String filtro = scanner.nextLine();
+
+                String sqlSelect = "SELECT * FROM Alumnado WHERE " + filtro;
+                stmt = conector.createStatement();
+                rs = stmt.executeQuery(sqlSelect);
+
+                System.out.println("Datos que serán eliminados:");
+                while (rs.next()) {
+                    System.out.println("ID Alumnado: " + rs.getInt("idAlumnado") + ", Nombre: " + rs.getString("nombre") + ", Apellidos: " + rs.getString("apellidos") + ", Fecha Nacimiento: " + rs.getString("fechaNac"));
+                }
+
+                System.out.println("¿Desea confirmar la eliminación de estos datos? (sí/no): ");
+                String confirmar = scanner.nextLine();
+
+                if (confirmar.equalsIgnoreCase("sí")) {
+                    String sqlDelete = "DELETE FROM Alumnado WHERE " + filtro;
+                    stmt.executeUpdate(sqlDelete);
+                    conector.commit();
+                    System.out.println("Los datos han sido eliminados correctamente.");
+                } else {
+                    System.out.println("Operación cancelada.");
+                    conector.rollback();
+                }
+            } else {
+                System.out.println("Opción no válida. Operación cancelada.");
+                conector.rollback();
+            }
+
+        } catch (SQLException se) {
+            try {
+                if (conector != null) conector.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conector != null) conector.close();
+            } catch (SQLException se) {
+                System.out.println("No se ha podido cerrar la conexión.");
+            }
+        }
+    }
+}
+public static void borrarTablaMatricula() {
+    Connection conector = null;
+    Statement stmt = null;
+    try (Scanner scanner = new Scanner(System.in)) {
+        try {
+            conector = ConexionBD.connect();
+            conector.setAutoCommit(false);
+
+            System.out.println("ADVERTENCIA: Esta acción eliminará la tabla 'Matricula' por completo. ¿Desea continuar? (sí/no): ");
+            String confirmar = scanner.nextLine();
+
+            if (confirmar.equalsIgnoreCase("sí")) {
+                stmt = conector.createStatement();
+                stmt.executeUpdate("DROP TABLE Matricula");
+                conector.commit();
+                System.out.println("La tabla 'Matricula' ha sido eliminada correctamente.");
+            } else {
+                System.out.println("Operación cancelada.");
+                conector.rollback();
+            }
+        } catch (SQLException se) {
+            try {
+                if (conector != null) conector.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            se.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conector != null) conector.close();
+            } catch (SQLException se) {
+                System.out.println("No se ha podido cerrar la conexión.");
+            }
+        }
+    }
+}
+
+public static void borrarTablaProfesores() {
+    Connection conector = null;
+    Statement stmt = null;
+    try (Scanner scanner = new Scanner(System.in)) {
+        try {
+            conector = ConexionBD.connect();
+            conector.setAutoCommit(false); 
+
+            System.out.println("ADVERTENCIA: Esta acción eliminará la tabla 'Profesores' por completo. ¿Desea continuar? (sí/no): ");
+            String confirmar = scanner.nextLine();
+
+            if (confirmar.equalsIgnoreCase("sí")) {
+                stmt = conector.createStatement();
+                stmt.executeUpdate("DROP TABLE Profesores");
+                conector.commit();
+                System.out.println("La tabla 'Profesores' ha sido eliminada correctamente.");
+            } else {
+                System.out.println("Operación cancelada.");
+                conector.rollback();
+            }
+        } catch (SQLException se) {
+            try {
+                if (conector != null) conector.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            se.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conector != null) conector.close();
+            } catch (SQLException se) {
+                System.out.println("No se ha podido cerrar la conexión.");
+            }
+        }
+    }
+}
+
+public static void borrarTablaAlumnado() {
+    Connection conector = null;
+    Statement stmt = null;
+    try (Scanner scanner = new Scanner(System.in)) {
+        try {
+            conector = ConexionBD.connect();
+            conector.setAutoCommit(false); 
+
+            System.out.println("ADVERTENCIA: Esta acción eliminará la tabla 'Alumnado' por completo. ¿Desea continuar? (sí/no): ");
+            String confirmar = scanner.nextLine();
+
+            if (confirmar.equalsIgnoreCase("sí")) {
+                stmt = conector.createStatement();
+                stmt.executeUpdate("DROP TABLE Alumnado");
+                conector.commit();
+                System.out.println("La tabla 'Alumnado' ha sido eliminada correctamente.");
+            } else {
+                System.out.println("Operación cancelada.");
+                conector.rollback();
+            }
+        } catch (SQLException se) {
+            try {
+                if (conector != null) conector.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            se.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conector != null) conector.close();
+            } catch (SQLException se) {
+                System.out.println("No se ha podido cerrar la conexión.");
+            }
+        }
+    }
+}
 
 }
