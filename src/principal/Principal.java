@@ -15,7 +15,7 @@ public class Principal {
         while (!salir) {
             menu();
             
-            int opcion = obtenerOpcion(7);  // Validación de opción
+            int opcion = obtenerOpcion(7);  
 
             switch (opcion) {
                 case 1:
@@ -25,7 +25,7 @@ public class Principal {
                     System.out.println("3.MATRICULA");
                     System.out.println("4.MENU PRINCIPAL");
 
-                    int opcionCrear = obtenerOpcion(4);  // Validación de opción
+                    int opcionCrear = obtenerOpcion(4);  
 
                     switch (opcionCrear) {
                         case 1:
@@ -49,7 +49,7 @@ public class Principal {
                     System.out.println("3.MATRICULA");
                     System.out.println("4.MENU PRINCIPAL");
 
-                    int opcionInsertar = obtenerOpcion(4);  // Validación de opción
+                    int opcionInsertar = obtenerOpcion(4);  
 
                     switch (opcionInsertar) {
                         case 1:
@@ -76,7 +76,7 @@ public class Principal {
                     System.out.println("6.TODAS LAS MATRICULAS");
                     System.out.println("7.MENU PRINCIPAL");
 
-                    int opcionListar = obtenerOpcion(7);  // Validación de opción
+                    int opcionListar = obtenerOpcion(7);  
 
                     switch (opcionListar) {
                         case 1:
@@ -127,7 +127,7 @@ public class Principal {
                     System.out.println("3.MATRICULA");
                     System.out.println("4.MENU PRINCIPAL");
 
-                    int opcionModificar = obtenerOpcion(4);  // Validación de opción
+                    int opcionModificar = obtenerOpcion(4);  
 
                     switch (opcionModificar) {
                         case 1:
@@ -151,7 +151,7 @@ public class Principal {
                     System.out.println("3.MATRICULA");
                     System.out.println("4.MENU PRINCIPAL");
 
-                    int opcionBorrar = obtenerOpcion(4);  // Validación de opción
+                    int opcionBorrar = obtenerOpcion(4); 
 
                     switch (opcionBorrar) {
                         case 1:
@@ -175,7 +175,7 @@ public class Principal {
                     System.out.println("3.MATRICULA");
                     System.out.println("4.MENU PRINCIPAL");
 
-                    int opcionBorrarTabla = obtenerOpcion(4);  // Validación de opción
+                    int opcionBorrarTabla = obtenerOpcion(4);  
 
                     switch (opcionBorrarTabla) {
                         case 1:
@@ -219,7 +219,7 @@ public class Principal {
         while (opcion < 1 || opcion > limite) {
             if (scanner.hasNextInt()) {
                 opcion = scanner.nextInt();
-                scanner.nextLine();  // Limpiar el salto de línea restante
+                scanner.nextLine();  
                 if (opcion < 1 || opcion > limite) {
                     System.out.println("Opción no válida. Por favor, elija una opción entre 1 y " + limite);
                 }
