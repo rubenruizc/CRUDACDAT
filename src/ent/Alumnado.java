@@ -27,7 +27,7 @@ public class Alumnado {
 			this.apellidos = apellidos;
 		}
 		
-		if(fechaNac != null && fechaNac.isEmpty()) {
+		if(fechaNac != null && !fechaNac.isEmpty()) {
 			this.fechaNac = fechaNac;
 		}
 	}
@@ -67,7 +67,7 @@ public class Alumnado {
 	}
 
 	public void setFechaNac(String fechaNac) {
-		if(fechaNac != null && fechaNac.isEmpty()) {
+		if(fechaNac != null && !fechaNac.isEmpty()) {
 			this.fechaNac = fechaNac;
 		}
 	}

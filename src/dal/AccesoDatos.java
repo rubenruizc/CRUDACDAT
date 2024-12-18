@@ -129,7 +129,7 @@ public class AccesoDatos {
  	* contiene las columnas: idAlumnado (clave primaria), nombre, apellidos y fechaNac.
  	* Gestiona y reporta cualquier error que pueda ocurrir durante la ejecución.
  	*/
-	public static void CrearTablarALumnos() {
+	public static void crearTablarALumnos() {
 			Statement stmt = null;
 			Connection conector = null;
 			try {
@@ -187,7 +187,7 @@ public class AccesoDatos {
 	 * fechaNac y antiguedad. Gestiona y reporta cualquier error que pueda ocurrir
 	 * durante la ejecución.
 	 */
-	public static void CrearTablarProfesores() {
+	public static void crearTablarProfesores() {
 		Statement stmt = null;
 		Connection conector = null;
 		try {
@@ -246,7 +246,7 @@ public class AccesoDatos {
  	* idAlumnado, asignatura y curso. Gestiona y reporta cualquier error que
  	* pueda ocurrir durante la ejecución.
  	*/
-	public static void CrearTablarMatricula() {
+	public static void crearTablarMatricula() {
 		Statement stmt = null;
 		Connection conector = null;
 		try {
@@ -467,11 +467,14 @@ public class AccesoDatos {
 	 */
 	public static void listarAlumnos(String campo, String operador, String valor) {
 		PreparedStatement stmt = null;
+		Statement st = null;
 		Connection conector = null;
 		ResultSet rs = null;
 	
 		try {
 			conector = ConexionBD.connect();
+			st = conector.createStatement();
+            st.executeUpdate(useDB);
 			String sqlBase = "SELECT * FROM Alumno";
 			String sql = sqlBase;
 	
@@ -554,19 +557,20 @@ public class AccesoDatos {
 	
 		try {
 			conector = ConexionBD.connect();
-			String sql = "SELECT * FROM Alumno";
+			String sql = "SELECT * FROM Alumnado";
 	
 			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 			rs = stmt.executeQuery(sql);
 	
 			// Imprimir los resultados
 			while (rs.next()) {
 				int idAlumnado = rs.getInt("idAlumnado");
 				String nombre = rs.getString("nombre");
-				String apellidos = rs.getString("apellido");
+				String apellidos = rs.getString("apellidos");
 				String fechaNac = rs.getString("fechaNac");
 	
-				System.out.println("ID: " + idAlumnado + ", Nombre: " + nombre + ", Apellido: " + apellidos + ", Fecha de Nacimiento: " + fechaNac);
+				System.out.println("ID: " + idAlumnado + ", Nombre: " + nombre + ", Apellidos: " + apellidos + ", Fecha de Nacimiento: " + fechaNac);
 			}
 	
 		} catch (SQLException se) {
@@ -600,11 +604,14 @@ public class AccesoDatos {
 	 */
 	public static void listarProfesores(String campo, String operador, String valor) {
 		PreparedStatement stmt = null;
+		Statement st = null;
 		Connection conector = null;
 		ResultSet rs = null;
 	
 		try {
 			conector = ConexionBD.connect();
+			st = conector.createStatement();
+            st.executeUpdate(useDB);
 			String sqlBase = "SELECT * FROM Profesor";
 			String sql = sqlBase;
 	
@@ -704,17 +711,18 @@ public class AccesoDatos {
 			String sql = "SELECT * FROM Profesores";
 	
 			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 			rs = stmt.executeQuery(sql);
 	
 			// Imprimir los resultados
 			while (rs.next()) {
 				int idProfesor = rs.getInt("idProfesor");
 				String nombre = rs.getString("nombre");
-				String apellidos = rs.getString("apellido");
+				String apellidos = rs.getString("apellidos");
 				String fechaNac = rs.getString("fechaNac");
 				String antiguedad = rs.getString("antiguedad");
 	
-				System.out.println("ID: " + idProfesor + ", Nombre: " + nombre + ", Apellido: " + apellidos + ", Fecha de Nacimiento: " + fechaNac + ", Antiguedad: " +antiguedad);
+				System.out.println("ID: " + idProfesor + ", Nombre: " + nombre + ", Apellidos: " + apellidos + ", Fecha de Nacimiento: " + fechaNac + ", Antiguedad: " +antiguedad);
 			}
 	
 		} catch (SQLException se) {
@@ -748,11 +756,14 @@ public class AccesoDatos {
 	 */
 	public static void listarMatricula(String campo, String operador, String valor) {
 		PreparedStatement stmt = null;
+		Statement st = null;
 		Connection conector = null;
 		ResultSet rs = null;
 	
 		try {
 			conector = ConexionBD.connect();
+			st = conector.createStatement();
+            st.executeUpdate(useDB);
 			String sqlBase = "SELECT * FROM Matricula";
 			String sql = sqlBase;
 	
@@ -855,7 +866,9 @@ public class AccesoDatos {
 			String sql = "SELECT * FROM Matricula";
 	
 			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 			rs = stmt.executeQuery(sql);
+			
 	
 			// Imprimir los resultados
 			while (rs.next()) {
@@ -896,7 +909,9 @@ public class AccesoDatos {
     try (Scanner scanner = new Scanner(System.in)) {
 		try {
 		    conector = ConexionBD.connect();
-		    conector.setAutoCommit(false); // Iniciar la transacción
+			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
+		    conector.setAutoCommit(false); 
 
 		    System.out.println("Indique el ID de la matrícula que desea modificar: ");
 		    int idMatriculaFiltro = scanner.nextInt();
@@ -984,7 +999,9 @@ public class AccesoDatos {
     try (Scanner scanner = new Scanner(System.in)) {
 		try {
 		    conector = ConexionBD.connect();
-		    conector.setAutoCommit(false); // Iniciar la transacción
+		    conector.setAutoCommit(false); 
+			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 
 		    System.out.println("Indique el ID del profesor que desea modificar: ");
 		    int idProfesorFiltro = scanner.nextInt();
@@ -1070,7 +1087,9 @@ public class AccesoDatos {
     try (Scanner scanner = new Scanner(System.in)) {
 		try {
 		    conector = ConexionBD.connect();
-		    conector.setAutoCommit(false); // Iniciar la transacción
+		    conector.setAutoCommit(false); 
+			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 
 		    System.out.println("Indique el ID del alumnado que desea modificar: ");
 		    int idAlumnadoFiltro = scanner.nextInt();
@@ -1151,7 +1170,9 @@ public static void borrarDatosMatricula() {
     try (Scanner scanner = new Scanner(System.in)) {
 		try {
 		    conector = ConexionBD.connect();
-		    conector.setAutoCommit(false); // Iniciar la transacción
+		    conector.setAutoCommit(false); 
+			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 
 		    System.out.println("¿Desea borrar todas las tablas o una tabla concreta? (todas/concreta): ");
 		    String opcion = scanner.nextLine();
@@ -1162,7 +1183,7 @@ public static void borrarDatosMatricula() {
 
 		        if (confirmar.equalsIgnoreCase("sí")) {
 		            stmt = conector.createStatement();
-		            stmt.executeUpdate("DROP TABLE Matricula"); // Ajustar según las dependencias de otras tablas
+		            stmt.executeUpdate("DROP TABLE Matricula"); 
 		            conector.commit();
 		            System.out.println("Todas las tablas han sido borradas.");
 		        } else {
@@ -1248,6 +1269,8 @@ public static void borrarDatosProfesor() {
         try {
             conector = ConexionBD.connect();
             conector.setAutoCommit(false); 
+			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 
             System.out.println("¿Desea borrar todos los profesores o aplicar un filtro? (todos/filtro): ");
             String opcion = scanner.nextLine();
@@ -1316,6 +1339,7 @@ public static void borrarDatosProfesor() {
     }
 }
 public static void borrarDatosAlumnado() {
+
     Connection conector = null;
     Statement stmt = null;
     ResultSet rs = null;
@@ -1323,6 +1347,8 @@ public static void borrarDatosAlumnado() {
         try {
             conector = ConexionBD.connect();
             conector.setAutoCommit(false); 
+			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 
             System.out.println("¿Desea borrar todos los registros de alumnado o aplicar un filtro? (todos/filtro): ");
             String opcion = scanner.nextLine();
@@ -1390,6 +1416,7 @@ public static void borrarDatosAlumnado() {
         }
     }
 }
+
 public static void borrarTablaMatricula() {
     Connection conector = null;
     Statement stmt = null;
@@ -1397,6 +1424,8 @@ public static void borrarTablaMatricula() {
         try {
             conector = ConexionBD.connect();
             conector.setAutoCommit(false);
+			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 
             System.out.println("ADVERTENCIA: Esta acción eliminará la tabla 'Matricula' por completo. ¿Desea continuar? (sí/no): ");
             String confirmar = scanner.nextLine();
@@ -1435,6 +1464,8 @@ public static void borrarTablaProfesores() {
         try {
             conector = ConexionBD.connect();
             conector.setAutoCommit(false); 
+			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 
             System.out.println("ADVERTENCIA: Esta acción eliminará la tabla 'Profesores' por completo. ¿Desea continuar? (sí/no): ");
             String confirmar = scanner.nextLine();
@@ -1473,11 +1504,13 @@ public static void borrarTablaAlumnado() {
         try {
             conector = ConexionBD.connect();
             conector.setAutoCommit(false); 
+			stmt = conector.createStatement();
+            stmt.executeUpdate(useDB);
 
-            System.out.println("ADVERTENCIA: Esta acción eliminará la tabla 'Alumnado' por completo. ¿Desea continuar? (sí/no): ");
+            System.out.println("ADVERTENCIA: Esta acción eliminará la tabla 'Alumnado' por completo. ¿Desea continuar? (si/no): ");
             String confirmar = scanner.nextLine();
 
-            if (confirmar.equalsIgnoreCase("sí")) {
+            if (confirmar.equalsIgnoreCase("si")) {
                 stmt = conector.createStatement();
                 stmt.executeUpdate("DROP TABLE Alumnado");
                 conector.commit();
